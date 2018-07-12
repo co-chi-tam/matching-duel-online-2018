@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Hello world</title>
+   </head>
+   
+   <script src = "/socket.io/socket.io.js"></script>
+   <script>
+      var socket = io();
+      var turnIndex = 0;
+      function setUsername() {
+         socket.emit('setPlayername', 
+         { 'playerName': document.getElementById('name').value });
+      };
+      var user;
+      socket.on('welcome', function(data) {
+         console.log(JSON.stringify(data));
+      });
+      socket.on('playerExists', function(data) {
+         document.getElementById('error-container').innerHTML = data;
+      });
+      socket.on('userSet', function(data) {
+         user = data.username;
+         document.body.innerHTML = '<input type = "text" id = "message">\
+         <button type = "button" name = "button" onclick = "sendMessage()">Send</button>';
+      });
+      function sendMessage() {
+         var msg = document.getElementById('message').value;
+         if(msg) {
+            socket.emit('sendRoomChat', {message: msg, user: user});
+            document.getElementById('message').value = '';
+         }
+      }
+      socket.on('msgChatRoom', function(data) {
+         if (user) {
+            document.getElementById('message-container').innerHTML += '<div><b>' + 
+               data.user + '</b>: ' + data.message + '</div>'
+         }
+         console.log ('MESSAGE RECEIVE ' + JSON.stringify(data));
+      })
+      socket.on('turnIndexSet', function(data) {
+         turnIndex = data.turnIndex;
+         console.log ('TURN INDEX RECEIVE ' + JSON.stringify(data));
+      })
+      function JoinOrCreateRoom() {
+            socket.emit('joinOrCreateRoom', { roomName: 'room-1' });
+      }
+      function LeaveRoom() {
+            socket.emit('leaveRoom');
+      }
+      function SendChessPosition(x, y, index) {
+            socket.emit('sendChessPosition', { posX: x, posY: y, turnIndex: index });
+      }
+      function SendMatchingPosition(x, y, index) {
+            socket.emit('sendMatchingSpot', { posX: x, posY: y, turnIndex: index });
+      }
+      socket.on('newJoinRoom', function(data) {
+            genGrid(7, 7);
+            console.log (JSON.stringify(data));
+      });
+      socket.on('receiveChessPosition', function(data) {
+            console.log (JSON.stringify(data));
+      });
+      socket.on('receiveMatchingPosition', function(data) {
+            console.log (JSON.stringify(data));
+      });
+      socket.on('clearRoom', function(data) {
+            console.log ("Room is clear ... ");
+      });
+      socket.on('receiveChessFail', function(data) {
+            console.log (JSON.stringify(data));
+      });
+      socket.on('beep', function(data) {
+            console.log ("beep");
+      });
+      setInterval(function(){
+            socket.emit("beep");
+      }, 1000);
+      function genGrid(column, row){ 
+            document.getElementById("grid").innerHTML = '';
+            var e = document.getElementById("grid").innerHTML; // whatever you want to append the rows to: 
+            e += '<div>'+ turnIndex +'</div>';
+            for (let y = 0; y < column; y++) {
+                  for (let x = 0; x < row; x++) {
+                        e += '<button type = "button" name = "button" onclick = "SendMatchingPosition('+ x +', '+ y +', '+ turnIndex +')">Chess X:'+ x +', Y:'+ y +'</button>';
+                  }
+                  e += '</br>';
+            }
+            document.getElementById("grid").innerHTML = e;
+      }
+   </script>
+   <body>
+      <div id = "error-container"></div>
+      <input id = "name" type = "text" name = "name" value = "" 
+         placeholder = "Enter your name!" />
+      <button type = "button" name = "button" onclick = "setUsername()">
+         Let me chat!
+      </button>
+      <button type = "button" name = "button" onclick = "JoinOrCreateRoom()">
+            Join or Create room
+      </button>
+      <button type = "button" name = "button" onclick = "LeaveRoom()">
+            Leave room
+      </button>
+      </br>
+      <did id="grid"></did>
+   </body>
+</html>
