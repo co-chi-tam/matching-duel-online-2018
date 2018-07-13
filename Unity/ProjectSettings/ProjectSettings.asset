@@ -153,7 +153,7 @@ PlayerSettings:
     Android: com.dorianco.matching_duel_online_2018
     Standalone: com.Company.ProductName
   buildNumber: {}
-  AndroidBundleVersionCode: 1
+  AndroidBundleVersionCode: 2
   AndroidMinSdkVersion: 18
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
@@ -241,7 +241,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 5
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: E:/Test/MatchingDuelOnline2018/Android/user.keystore
+  AndroidKeystoreName: E:/Test/Gihub/matching-duel-online-2018/trunk/Unity/Android/user.keystore
   AndroidKeyaliasName: matching_duel_key
   AndroidTVCompatibility: 1
   AndroidIsGame: 1

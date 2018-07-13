@@ -43,6 +43,8 @@ public class CGameManager : CMonoSingleton<CGameManager> {
 	[SerializeField]	protected CChess m_MatchChess1;
 	[SerializeField]	protected CChess m_MatchChess2;
 
+	[Header("Game config")]
+	[SerializeField]	protected Animator m_TurnAnimator;
 
 	protected CPlayer m_Player;
 
@@ -95,7 +97,7 @@ public class CGameManager : CMonoSingleton<CGameManager> {
 	#region State Game
 
 	public virtual void OnStartGame() {
-
+		this.AnimationYourTurn();
 	}
 
 	public virtual void OnUpdateGame(int x, int y) {
@@ -136,6 +138,7 @@ public class CGameManager : CMonoSingleton<CGameManager> {
 		this.m_MatchChess1 = null;
 		this.m_MatchChess2 = null;
 		this.m_MatchCount = 0;
+		this.AnimationYourTurn();
 		this.CheckTurn();
 	}
 
@@ -162,6 +165,12 @@ public class CGameManager : CMonoSingleton<CGameManager> {
 
 	public virtual void OnResetGame() {
 		this.m_Player.LeaveRoom();
+	}
+
+	public virtual void AnimationYourTurn() {
+		if (this.m_TurnAnimator != null && this.IsLocalTurn()) {
+			this.m_TurnAnimator.SetTrigger ("StartGame");
+		}
 	}
 
 	#endregion

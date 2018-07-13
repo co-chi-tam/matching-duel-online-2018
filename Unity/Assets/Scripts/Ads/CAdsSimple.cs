@@ -6,11 +6,8 @@ using UnityEngine.Events;
 
 public class CAdsSimple : MonoBehaviour {
 
-	#if UNITY_IOS
    	[SerializeField]	protected string gameId = "2663901";
-    #elif UNITY_ANDROID
-    [SerializeField]	protected string gameId = "2663901";
-    #endif
+    
 	[SerializeField]	protected string placementId = "video"; // "rewardedVideo";
 
 	[Header("Events")]

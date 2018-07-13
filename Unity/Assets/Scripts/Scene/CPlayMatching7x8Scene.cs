@@ -11,12 +11,12 @@ public class CPlayMatching7x8Scene : MonoBehaviour {
 
 	protected CPlayer m_Player;
 	protected CGameManager m_GameManager;
+
 	protected bool m_IsStartGame = false;
 
 	protected virtual void Start() {
 		this.m_Player = CPlayer.GetInstance();
 		this.m_GameManager = CGameManager.GetInstance();
-		this.m_IsStartGame = false;
 		this.SetupPlayers();
 		InvokeRepeating("SetupPlayers", 0f, 1f);
 	}
@@ -40,10 +40,17 @@ public class CPlayMatching7x8Scene : MonoBehaviour {
 	}
 
 	protected virtual void PlayAnimStartGame() {
-		if (this.m_IsStartGame == false) {
+		if (this.m_IsStartGame)
+			return;
+		if (this.m_Animator != null) {
 			this.m_Animator.SetTrigger ("StartGame");
-			this.m_IsStartGame = true;
 		}
+		Invoke("PlayFirstTurn", 1);
+		this.m_IsStartGame = true;
+	}
+
+	public virtual void PlayFirstTurn() {
+		this.m_GameManager.AnimationYourTurn();
 	}
 
 }
