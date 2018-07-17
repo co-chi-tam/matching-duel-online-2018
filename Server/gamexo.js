@@ -5,14 +5,6 @@ users = []; // Array User names
 rooms = {}; // Rooms
 column = 7; 
 row = 8;
-matchingMap = [ 0,0,1,1,2,2,3,
-                3,4,4,5,5,6,6,
-                7,7,8,8,9,9,10,
-                10,11,11,12,12,13,13,
-                14,14,15,15,16,16,17,
-                17,18,18,19,19,20,20,
-                21,21,22,22,23,23,24,
-                24,25,25,26,26,27,27 ];
 
 const MAXIMUM_ROOMS = 10; // Maximum rooms
 
@@ -102,7 +94,7 @@ var GameXO = function (http) {
                 rooms [roomName].roomName = roomName;
                 // SHUFFLE MATCHING MAP
                 if (typeof(rooms [roomName].matchingMap) === 'undefined') {
-                    rooms [roomName].matchingMap = self.shuffle(matchingMap);
+                    rooms [roomName].matchingMap = self.generateMap();
                     rooms [roomName].exactlyTurn = 0;
                 }
                 if (rooms [roomName].contain (socket) == false) {
@@ -197,7 +189,8 @@ var GameXO = function (http) {
         // Send Matching position with check available.
         socket.on('sendMatchingSpot', function(msg) {
             if(msg && socket.player && socket.room) {
-                if (socket.room.length() > 1) {
+                if (socket.room.length() > 1 
+                    && socket.room.matchingMap) {
                     // Exp: x:0,y:1    y * column + x = 7
                     var mPos1 = {
                         x: msg.pos1X,    // parseInt
@@ -207,8 +200,8 @@ var GameXO = function (http) {
                         x: msg.pos2X,    // parseInt
                         y: msg.pos2Y     // parseInt
                     }
-                    var value1 = matchingMap[mPos1.y * column + mPos1.x];
-                    var value2 = matchingMap[mPos2.y * column + mPos2.x];
+                    var value1 = socket.room.matchingMap[mPos1.y * column + mPos1.x];
+                    var value2 = socket.room.matchingMap[mPos2.y * column + mPos2.x];
                     var sendChecking = socket.game.turnIndex == msg.turnIndex
                                         && socket.game.turnIndex == socket.room.exactlyTurn;
                     if (sendChecking) {
@@ -229,7 +222,7 @@ var GameXO = function (http) {
                         socket.player.chessLists.push(mPos2);
                     } else {
                         socket.emit('receiveChessFail', {
-                            msg: msg.turnIndex != gameCurrentTurn 
+                            msg: msg.turnIndex != socket.room.exactlyTurn 
                                 ? "This is NOT your turn."
                                 : "You can NOT do that."
                         });
@@ -288,8 +281,16 @@ var GameXO = function (http) {
             }
         });
     });
-    // SHUFFLE ARRAY
-    this.shuffle = function(a) {
+    // GENERATE AND SHUFFLE ARRAY
+    this.generateMap = function() {
+        var a = [ 0,0,1,1,2,2,3,
+            3,4,4,5,5,6,6,
+            7,7,8,8,9,9,10,
+            10,11,11,12,12,13,13,
+            14,14,15,15,16,16,17,
+            17,18,18,19,19,20,20,
+            21,21,22,22,23,23,24,
+            24,25,25,26,26,27,27 ]
         var j, x, i;
         for (i = a.length - 1; i > 0; i--) {
             j = Math.floor(Math.random() * (i + 1));
